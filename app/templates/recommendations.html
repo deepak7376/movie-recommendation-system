@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommended Movies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        #recommendation-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .movie-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            padding: 10px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+        .movie-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+        .movie-card h3 {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .movie-card p {
+            color: #555;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Similar Movies like <span id="selected-movie">{{ movie_title }}</span></h1>
+    <div id="recommendation-list"></div>
+
+    <script>
+        // Fetch recommendations from the backend
+        async function fetchRecommendations(movieTitle) {
+            const response = await fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ movie: movieTitle }),
+            });
+
+            if (response.ok) {
+                const recommendations = await response.json();
+                displayRecommendations(recommendations);
+            } else {
+                document.getElementById('recommendation-list').textContent = 'No recommendations found!';
+            }
+        }
+
+        // Display recommendations on the page
+        function displayRecommendations(recommendations) {
+            const recommendationList = document.getElementById('recommendation-list');
+            recommendationList.innerHTML = '';
+
+            for (let movie of recommendations) {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card';
+
+                const poster = document.createElement('img');
+                poster.src = movie.poster || 'https://via.placeholder.com/200x300?text=No+Image';
+                movieCard.appendChild(poster);
+
+                const title = document.createElement('h3');
+                title.textContent = movie.title;
+                movieCard.appendChild(title);
+
+                const genres = document.createElement('p');
+                genres.textContent = movie.genres;
+                movieCard.appendChild(genres);
+
+                recommendationList.appendChild(movieCard);
+            }
+        }
+
+        // On page load, fetch recommendations
+        const selectedMovie = "{{ movie_title }}";
+        fetchRecommendations(selectedMovie);
+    </script>
+
+</body>
+</html>

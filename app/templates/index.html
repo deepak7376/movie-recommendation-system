@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        #movie-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .movie-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            padding: 10px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+        .movie-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+        .movie-card h3 {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .movie-card p {
+            color: #555;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Select Movie to get Recommendation</h1>
+    <div id="movie-list"></div>
+
+    <script>
+        // Fetch all movies from the backend
+        async function fetchMovies() {
+            const response = await fetch('{{ url_for("get_movies") }}');
+            const movies = await response.json();
+            displayMovies(movies);
+        }
+
+        // Display movies as clickable cards
+        function displayMovies(movies) {
+            const movieList = document.getElementById('movie-list');
+            movieList.innerHTML = '';
+
+            movies.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card';
+
+                const poster = document.createElement('img');
+                poster.src = movie.poster || 'https://via.placeholder.com/200x300?text=No+Image';
+                movieCard.appendChild(poster);
+
+                const title = document.createElement('h3');
+                title.textContent = movie.title;
+                movieCard.appendChild(title);
+
+                const genres = document.createElement('p');
+                genres.textContent = movie.genres;
+                movieCard.appendChild(genres);
+
+                movieCard.onclick = () => viewRecommendations(movie.title);
+                movieList.appendChild(movieCard);
+            });
+        }
+
+        // Redirect to recommendations page
+        function viewRecommendations(movieTitle) {
+            window.location.href = `{{ url_for('recommendations') }}?movie=${encodeURIComponent(movieTitle)}`;
+        }
+
+        // Fetch movies on page load
+        fetchMovies();
+    </script>
+
+</body>
+</html>
