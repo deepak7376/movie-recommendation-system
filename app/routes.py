@@ -24,7 +24,7 @@ def recommendations():
 
 @app.route('/movies', methods=['GET'])
 def get_movies():
-    sampled_movies = movies[['movieId', 'imdbId', 'title', 'genres']]#.sample(n=30, random_state=1)
+    sampled_movies = movies[['movieId', 'imdbId', 'title', 'genres']].sample(n=30, random_state=1)
     
     movie_details = []
     for _, row in sampled_movies.iterrows():
